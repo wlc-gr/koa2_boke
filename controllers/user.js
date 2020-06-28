@@ -54,7 +54,7 @@ module.exports = {
 		// 生成salt
 		const salt = await bcrypt.genSalt(10);
 		let { name, email, password, repassword } = ctx.request.body;
-		
+
 		if (validator.isEmpty(name) === true) {
 			ctx.flash = { warning: '用户名不能为空' };
 			return ctx.redirect('back');
@@ -71,7 +71,7 @@ module.exports = {
 			ctx.flash = { warning: '密码不一致' };
 			return ctx.redirect('back');
 		}
-		
+
     	// 对密码进行加密
     	password = await bcrypt.hash(password, salt)
 		const user = {
@@ -81,13 +81,15 @@ module.exports = {
 		};
 		try {
             const result = await UsersModel.create(user);
-            let code = Math.floor(new Date()) + Math.random();
+            let code = Math.floor(new Date().getMilliseconds()) + Math.random();
+            console.log(`${code}-------${email}`)
             redisClient.set(code, email);
             helpers.sendEmail(email, code, 'signin');
             ctx.flash = { success: '注册成功，请前往邮箱激活账号' };
             ctx.redirect('/');
-			
+
 		} catch (error) {
+            console.log(error)
 			ctx.flash = { warning: '用户名或邮箱已存在，请更换' };
 			return ctx.redirect('back');
 		}
@@ -99,10 +101,10 @@ module.exports = {
                 await UsersModel.findOneAndUpdate({ email: res }, {
                     isActive: true,
                 });
-                redisClient.del(code) 
-            } 
+                redisClient.del(code)
+            }
         });
-        ctx.flash = { success: '激活成功' }; 
+        ctx.flash = { success: '激活成功' };
         ctx.redirect('/');
     },
 	async signin(ctx, next) {
@@ -127,7 +129,7 @@ module.exports = {
 			return ctx.redirect('back');
 		}
         const user = await UsersModel.findOne({ name });
-        
+
 		if (user && await bcrypt.compare(password, user.password)) {
             if (user.isActive === false) {
                 ctx.flash = { warning: '邮箱未激活，请先激活邮箱' };

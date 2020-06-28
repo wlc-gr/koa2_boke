@@ -35,14 +35,14 @@ const UsersSchema = new Schema({
     },
     github: {
         type: 'string',
-        required: true,
+        required: false,
         default: ''
     },
 	meta: {
 		createAt: {
 			type: Date,
 			default: Date.now()
-		}	
+		}
 	}
 })
 

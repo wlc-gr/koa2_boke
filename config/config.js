@@ -11,6 +11,8 @@ module.exports = {
     redis_db_cache: process.env.REDIS_DB_CACHE || '',
     email_user: process.env.EMAIL_USER,
     email_password: process.env.EMAIL_PASSWORD,
+    email_service: process.env.EMAIL_SERVICE,
+    email_prot: process.env.EMAIL_PROT,
     domain: process.env.DOMAIN,
     app_key: process.env.APP_KEY
 }

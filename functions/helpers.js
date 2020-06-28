@@ -1,5 +1,5 @@
 module.exports = {
-	userInfo: function(user, ctx) {
+    userInfo: function (user, ctx) {
         ctx.session.user = {
             _id: user._id,
             name: user.name,
@@ -7,13 +7,13 @@ module.exports = {
             email: user.email
         }
     },
-    sendEmail: function(email, code, type = '') {
+    sendEmail: function (email, code, type = '') {
         const nodemailer = require('nodemailer');
         const config = require('../config/config')
         let transporter = nodemailer.createTransport({
-            service: 'qq', 
-            port: 25, 
-            secureConnection: true, // 使用了 SSL
+            host: config.email_service,
+            port: config.email_prot,
+            secureConnection: false, // 使用了 SSL
             auth: {
                 user: config.email_user,
                 // 这里不是邮箱密码，是你设置的smtp授权码
@@ -41,8 +41,8 @@ module.exports = {
                 </body>
                 </html>
                 `;
-        }
-        htmlDom = `
+        } else {
+            htmlDom = `
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -60,13 +60,14 @@ module.exports = {
                 </body>
                 </html>
                 `;
+        }
         let mailOptions = {
             from: `koa2 <${config.email_user}>`, // 发件人
             to: email, // 收件人
             subject: 'koa2.hellocode.name 账号激活', // 主题
             // 发送text或者html格式
-            // text: 'Hello world?', 
-            html: htmlDom 
+            // text: 'Hello world?',
+            html: htmlDom
         };
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
